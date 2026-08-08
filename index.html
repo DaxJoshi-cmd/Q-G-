@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>UniQuiz | Premium & Secure</title>
+    <title>UniQuiz | Ultimate Premium Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -16,16 +16,6 @@
             colors: { 
                 brand: { dark: '#1e1b4b', main: '#4338ca', light: '#818cf8', accent: '#fbbf24' },
                 kahoot: { purple: '#46178f', blue: '#1368ce', green: '#26890c', red: '#e21b3c', yellow: '#ffa602' }
-            },
-            animation: {
-                'fade-in': 'fadeIn 0.3s ease-out',
-                'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            },
-            keyframes: {
-                fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
-            },
-            boxShadow: {
-                'arcade': '0 4px 0 rgba(0,0,0,0.2)',
             }
           }
         }
@@ -34,69 +24,50 @@
     <style>
       .btn-push { transition: all 0.1s; transform: translateY(0); box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
       .btn-push:active { transform: translateY(4px); box-shadow: none !important; }
+      .btn-locked { opacity: 0.5; pointer-events: none; filter: grayscale(100%); }
       .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
       @keyframes bounce-sm { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
       .animate-bounce-sm { animation: bounce-sm 2s infinite; }
 
-      /* PREMIUM KAHOOT UI ADDITIONS */
-      @keyframes gradientBG {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-      }
-      .animated-bg {
-          background: linear-gradient(-45deg, #2b1055, #7597de, #23a6d5, #e73c7e);
-          background-size: 400% 400%;
-          animation: gradientBG 15s ease infinite;
-      }
+      @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+      .animated-bg { background: linear-gradient(-45deg, #2b1055, #7597de, #23a6d5, #e73c7e); background-size: 400% 400%; animation: gradientBG 15s ease infinite; }
       .shape-icon { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+      
+      .loader-spin { border-top-color: transparent; animation: spinner 1s linear infinite; }
+      @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
   </head>
   <body class="bg-gray-100 font-sans text-gray-800 min-h-screen pb-10 overflow-x-hidden">
 
     <!-- AUTH SCREEN -->
-    <div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-brand-dark bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-        <div class="glass-panel p-10 rounded-3xl shadow-2xl w-full max-w-md animate-fade-in border-t-8 border-brand-main relative">
+    <div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-brand-dark">
+        <div class="glass-panel p-10 rounded-3xl shadow-2xl w-full max-w-md border-t-8 border-brand-main relative">
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-brand-main text-white text-3xl font-black rounded-2xl mb-4 shadow-lg">U</div>
                 <h1 class="text-3xl font-black text-gray-800">UniQuiz</h1>
-                <p class="text-gray-500 font-bold text-sm">Centralized Faculty Access</p>
+                <p class="text-gray-500 font-bold text-sm">Faculty & Admin Portal</p>
             </div>
-
             <form onsubmit="event.preventDefault(); attemptLogin();" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Username / ID</label>
-                    <input type="text" id="login-user" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 font-bold focus:border-brand-main outline-none transition" placeholder="Enter ID">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Password</label>
-                    <input type="password" id="login-pass" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 font-bold focus:border-brand-main outline-none transition" placeholder="••••••••">
-                </div>
-                <div id="login-error" class="text-red-500 text-xs font-bold hidden text-center">Invalid Credentials</div>
-                <div id="db-status" class="text-gray-400 text-xs font-bold text-center animate-pulse">Connecting to Cloud Database...</div>
-                
-                <button type="submit" class="w-full bg-brand-main text-white py-4 rounded-xl font-black text-lg btn-push hover:bg-indigo-700 mt-4">SECURE LOGIN</button>
+                <input type="text" id="login-user" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 font-bold focus:border-brand-main outline-none" placeholder="Username / ID">
+                <input type="password" id="login-pass" class="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 font-bold focus:border-brand-main outline-none" placeholder="Password">
+                <button type="submit" class="w-full bg-brand-main text-white py-4 rounded-xl font-black text-lg btn-push mt-4">SECURE LOGIN</button>
             </form>
-            
-            <div class="mt-8 pt-6 border-t border-gray-100 text-center">
-                <p class="text-xs text-gray-400 font-bold mb-2">Student Access</p>
-                <button onclick="toggleStudentJoin()" class="w-full bg-white border-2 border-brand-main text-brand-main py-3 rounded-xl font-black btn-push hover:bg-indigo-50">
-                    🎮 Join Game with PIN
-                </button>
+            <div class="mt-6 pt-6 border-t border-gray-200 text-center">
+                <button onclick="toggleStudentJoin()" class="w-full bg-white border-2 border-brand-main text-brand-main py-3 rounded-xl font-black btn-push">🎮 Join Game with PIN</button>
             </div>
         </div>
     </div>
 
     <!-- STUDENT JOIN SCREEN -->
     <div id="student-join-screen" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-indigo-900 bg-opacity-95 backdrop-blur-sm">
-        <div class="bg-white p-8 rounded-3xl w-full max-w-md text-center shadow-2xl animate-fade-in border-4 border-indigo-500">
+        <div class="bg-white p-8 rounded-3xl w-full max-w-md text-center shadow-2xl border-4 border-indigo-500">
             <div id="join-step-1">
                 <h2 class="text-3xl font-black mb-2 text-gray-800">Join Session</h2>
                 <p class="text-gray-400 font-bold text-sm mb-6">Enter the code on the projector</p>
-                <input type="text" id="player-name-input" placeholder="Your Nickname" class="w-full text-center text-lg font-bold bg-gray-50 border-2 border-gray-200 rounded-xl py-3 mb-3 focus:border-indigo-500 outline-none">
-                <input type="text" id="game-pin-input" placeholder="GAME PIN" class="w-full text-center text-3xl font-black tracking-widest bg-gray-100 border-2 border-gray-200 rounded-xl py-4 mb-6 uppercase focus:border-indigo-500 outline-none placeholder-gray-300">
+                <input type="text" id="player-name-input" placeholder="Your Nickname" class="w-full text-center text-lg font-bold bg-gray-50 border-2 border-gray-200 rounded-xl py-3 mb-3">
+                <input type="text" id="game-pin-input" placeholder="GAME PIN" class="w-full text-center text-3xl font-black tracking-widest bg-gray-100 border-2 border-gray-200 rounded-xl py-4 mb-6 uppercase">
                 <div class="flex gap-2">
-                    <button onclick="toggleStudentJoin()" class="flex-1 bg-gray-200 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-300">Cancel</button>
+                    <button onclick="toggleStudentJoin()" class="flex-1 bg-gray-200 text-gray-600 py-3 rounded-xl font-bold btn-push">Cancel</button>
                     <button onclick="goToAvatarSelection()" class="flex-1 bg-brand-main text-white py-3 rounded-xl font-black btn-push shadow-[0_4px_0_rgb(55,48,163)]">NEXT</button>
                 </div>
             </div>
@@ -119,15 +90,12 @@
         <div class="mt-8 bg-black/20 px-6 py-2 rounded-lg font-mono" id="player-wait-pin">...</div>
     </div>
 
-    <!-- MAIN APP DASHBOARD (FACULTY / ADMIN) -->
+    <!-- MAIN APP DASHBOARD -->
     <div id="app-layout" class="hidden flex min-h-screen w-full">
-        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col z-20 shadow-lg hidden md:flex h-screen sticky top-0">
+        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col shadow-lg h-screen sticky top-0">
             <div class="p-6 flex items-center gap-3 border-b border-gray-100">
                 <div class="w-10 h-10 bg-brand-main rounded-xl flex items-center justify-center text-white font-black text-xl">U</div>
-                <div class="leading-tight">
-                    <span class="font-black text-xl text-gray-800 block">UniQuiz</span>
-                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Cloud Connected</span>
-                </div>
+                <div class="leading-tight"><span class="font-black text-xl block">UniQuiz</span></div>
             </div>
             <div class="p-4 bg-gray-50 border-b border-gray-100">
                 <div class="flex items-center gap-3">
@@ -138,87 +106,69 @@
                     </div>
                 </div>
             </div>
-            <div class="flex-1 overflow-y-auto py-6 px-3 space-y-2">
-                <button onclick="nav('library')" id="nav-library" class="sidebar-link w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition active bg-indigo-50 text-brand-main"><span>📚</span> Course Library</button>
-                <button onclick="nav('reports')" id="nav-reports" class="sidebar-link w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition"><span>📊</span> Grade Reports</button>
-                
-                <!-- Visible to both Admins and Professors now -->
+            <div class="flex-1 py-6 px-3 space-y-2">
+                <button onclick="nav('library')" id="nav-library" class="sidebar-link w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold bg-indigo-50 text-brand-main">📚 Course Library</button>
+                <button onclick="nav('reports')" id="nav-reports" class="sidebar-link w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-gray-500">📊 Grade Reports</button>
                 <div id="admin-menu" class="hidden pt-6 mt-6 border-t border-gray-200">
-                    <p class="px-4 text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Team Management</p>
-                    <button onclick="nav('users')" id="nav-users" class="sidebar-link w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition"><span>👥</span> Manage Faculty</button>
+                    <p class="px-4 text-xs font-black text-gray-400 uppercase mb-2">Team Management</p>
+                    <button onclick="nav('users')" id="nav-users" class="sidebar-link w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-gray-500">👥 Manage Faculty</button>
                 </div>
             </div>
-            <div class="p-4 border-t border-gray-100">
-                <button onclick="logout()" class="w-full text-left px-4 py-2 text-red-500 font-bold text-sm hover:bg-red-50 rounded-lg transition">Log Out</button>
-            </div>
+            <div class="p-4 border-t border-gray-100"><button onclick="logout()" class="w-full text-left px-4 py-2 text-red-500 font-bold">Log Out</button></div>
         </aside>
 
-        <main class="flex-1 bg-gray-100 h-full">
-            <div class="p-8 max-w-6xl mx-auto">
-                <div id="view-library" class="animate-fade-in">
-                    <header class="flex justify-between items-center mb-8">
-                        <div><h2 class="text-3xl font-black text-gray-800">My Library</h2><p class="text-gray-500 font-bold text-sm">Select a quiz to host live.</p></div>
-                        <button onclick="document.getElementById('create-modal').classList.remove('hidden')" class="bg-brand-main text-white px-6 py-3 rounded-xl font-bold text-sm btn-push hover:bg-indigo-700 shadow-[0_4px_0_rgb(55,48,163)]">+ Create Quiz</button>
-                    </header>
-                    <div id="quiz-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <main class="flex-1 bg-gray-100 p-8 max-w-6xl mx-auto">
+            <!-- LIBRARY VIEW -->
+            <div id="view-library">
+                <header class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-black text-gray-800">My Library</h2>
+                    <button onclick="openCreator()" class="bg-brand-main text-white px-6 py-3 rounded-xl font-bold btn-push shadow-[0_4px_0_rgb(55,48,163)]">+ Create Quiz</button>
+                </header>
+                <div id="quiz-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- REPORTS VIEW -->
+            <div id="view-reports" class="hidden">
+                <header class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-black text-gray-800">Performance Reports</h2>
+                    <button onclick="downloadCSV()" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold btn-push shadow-[0_4px_0_#166534]">📥 Export to Excel (CSV)</button>
+                </header>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden p-6 text-center">
+                    <h3 class="text-xl font-bold text-gray-500">Global Score Database</h3>
+                    <p class="text-sm text-gray-400 mb-4">Click the export button above to download all student scores.</p>
+                </div>
+            </div>
+
+            <!-- USERS VIEW -->
+            <div id="view-users" class="hidden">
+                <h2 class="text-3xl font-black text-gray-800 mb-8">Faculty Management</h2>
+                
+                <div id="super-admin-controls" class="hidden mb-8 bg-red-50 border border-red-200 p-6 rounded-2xl">
+                    <h3 class="font-black text-red-700 text-lg mb-2">⚠️ Super Admin Danger Zone</h3>
+                    <button onclick="wipeCloudUsers()" class="bg-red-600 text-white font-bold py-3 px-6 rounded-xl btn-push shadow-[0_4px_0_#991b1b]">Wipe All Users Data</button>
                 </div>
 
-                <div id="view-reports" class="hidden animate-fade-in">
-                    <h2 class="text-3xl font-black text-gray-800 mb-8">Performance Reports</h2>
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                        <table class="w-full text-left"><thead class="bg-gray-50 border-b border-gray-200"><tr><th class="p-4 text-xs font-black text-gray-400 uppercase">Date</th><th class="p-4 text-xs font-black text-gray-400 uppercase">Quiz</th><th class="p-4 text-xs font-black text-gray-400 uppercase">Participants</th></tr></thead><tbody><tr class="border-b border-gray-100"><td class="p-4 font-bold text-gray-500">Dec 05</td><td class="p-4 font-bold">Physics Mid-Term</td><td class="p-4 font-bold text-green-600">34 Students</td></tr></tbody></table>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 mb-8 shadow-sm">
+                    <h3 class="font-black text-lg mb-4">Create New Account</h3>
+                    <div class="flex gap-4">
+                        <input id="new-name" placeholder="Name" class="flex-1 bg-gray-50 border-2 border-gray-200 p-3 rounded-xl font-bold">
+                        <input id="new-user" placeholder="Username" class="flex-1 bg-gray-50 border-2 border-gray-200 p-3 rounded-xl font-bold">
+                        <input id="new-pass" placeholder="Password" class="flex-1 bg-gray-50 border-2 border-gray-200 p-3 rounded-xl font-bold">
+                        <select id="new-role" class="bg-gray-50 border-2 border-gray-200 p-3 rounded-xl font-bold text-gray-600">
+                            <!-- Populated in JS -->
+                        </select>
+                        <button onclick="addCloudUser()" class="bg-green-500 text-white px-6 rounded-xl font-black btn-push">Add User</button>
                     </div>
                 </div>
-
-                <div id="view-users" class="hidden animate-fade-in">
-                    <header class="mb-8">
-                        <h2 class="text-3xl font-black text-gray-800">Faculty Management</h2>
-                        <p class="text-gray-500 font-bold text-sm flex items-center gap-2">
-                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                            Synced with Firebase Cloud
-                        </p>
-                    </header>
-
-                    <!-- SUPER ADMIN DANGER ZONE -->
-                    <div id="super-admin-controls" class="hidden mb-8 bg-red-50 border border-red-200 p-6 rounded-2xl">
-                        <h3 class="font-black text-red-700 text-lg mb-2">⚠️ Super Admin Danger Zone</h3>
-                        <p class="text-sm text-red-600 font-bold mb-4">This action will completely wipe all registered users from the Firebase Cloud.</p>
-                        <button onclick="wipeCloudUsers()" class="bg-red-600 text-white font-bold py-3 px-6 rounded-xl btn-push shadow-[0_4px_0_#991b1b] hover:bg-red-500">Wipe All Users Data</button>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 h-fit">
-                            <h3 class="font-black text-lg mb-4 text-indigo-900">Add Cloud User</h3>
-                            <div class="space-y-4">
-                                <input id="new-name" placeholder="Full Name" class="w-full bg-gray-50 border-2 border-gray-200 p-3 rounded-xl font-bold text-sm outline-none focus:border-brand-main">
-                                <input id="new-user" placeholder="Username" class="w-full bg-gray-50 border-2 border-gray-200 p-3 rounded-xl font-bold text-sm outline-none focus:border-brand-main">
-                                <input id="new-pass" placeholder="Password" class="w-full bg-gray-50 border-2 border-gray-200 p-3 rounded-xl font-bold text-sm outline-none focus:border-brand-main">
-                                
-                                <!-- Dropdown changes based on who is logged in -->
-                                <select id="new-role" class="w-full bg-gray-50 border-2 border-gray-200 p-3 rounded-xl font-bold text-sm outline-none focus:border-brand-main text-gray-600">
-                                    <!-- Options injected via JavaScript -->
-                                </select>
-
-                                <button onclick="addCloudUser()" class="w-full bg-green-500 text-white py-3 rounded-xl font-black btn-push shadow-[0_4px_0_#15803d]">Create User</button>
-                            </div>
-                        </div>
-
-                        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                            <table class="w-full text-left">
-                                <thead class="bg-gray-50 border-b border-gray-200">
-                                    <tr>
-                                        <th class="p-4 text-xs font-black text-gray-400 uppercase">Name</th>
-                                        <th class="p-4 text-xs font-black text-gray-400 uppercase">Username</th>
-                                        <th class="p-4 text-xs font-black text-gray-400 uppercase">Role</th>
-                                        <th class="p-4 text-xs font-black text-gray-400 uppercase">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="user-list-body"></tbody>
-                            </table>
-                        </div>
-                    </div>
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr><th class="p-4 text-xs font-black text-gray-400 uppercase">Name</th><th class="p-4 text-xs font-black text-gray-400 uppercase">Role</th><th class="p-4 text-xs font-black text-gray-400 uppercase">Action</th></tr>
+                        </thead>
+                        <tbody id="user-list-body"></tbody>
+                    </table>
                 </div>
-
             </div>
         </main>
     </div>
@@ -238,55 +188,107 @@
             <button onclick="startGame()" class="bg-white text-indigo-900 px-16 py-4 rounded-2xl font-black text-2xl shadow-[0_6px_0_#c7d2fe] btn-push hover:bg-indigo-50">START GAME</button>
         </div>
     </div>
-    
-    <!-- UPGRADED PREMIUM GAME SCREEN (KAHOOT STYLE) -->
+
+    <!-- UPGRADED QUIZ CREATOR MODAL -->
+    <div id="create-modal" class="hidden fixed inset-0 z-[90] flex items-center justify-center bg-gray-900 bg-opacity-90 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl p-8 max-h-[90vh] overflow-y-auto">
+            <h2 class="text-3xl font-black text-gray-800 mb-4">🛠️ Quiz Builder</h2>
+            <input type="text" id="new-set-title" placeholder="Quiz Title (e.g. Science 101)" class="w-full bg-gray-100 border-2 border-gray-200 rounded-2xl px-6 py-4 font-bold text-xl mb-4 focus:border-brand-main outline-none">
+            
+            <div class="bg-gray-50 p-4 rounded-2xl border-2 border-gray-200 mb-4">
+                <h3 class="font-bold text-gray-500 mb-2">Question Editor</h3>
+                <input type="text" id="q-prompt" placeholder="Enter your question here..." class="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3 font-bold mb-3">
+                <input type="text" id="q-image" placeholder="Image URL (Optional - e.g. https://link.com/img.jpg)" class="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-sm mb-4">
+                
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <input type="text" id="opt-0" placeholder="🔺 Red Answer" class="bg-white border-2 border-red-200 rounded-xl px-4 py-3 font-bold focus:border-kahoot-red outline-none">
+                    <input type="text" id="opt-1" placeholder="🔷 Blue Answer" class="bg-white border-2 border-blue-200 rounded-xl px-4 py-3 font-bold focus:border-kahoot-blue outline-none">
+                    <input type="text" id="opt-2" placeholder="🟡 Yellow Answer" class="bg-white border-2 border-yellow-200 rounded-xl px-4 py-3 font-bold focus:border-kahoot-yellow outline-none">
+                    <input type="text" id="opt-3" placeholder="🟩 Green Answer" class="bg-white border-2 border-green-200 rounded-xl px-4 py-3 font-bold focus:border-kahoot-green outline-none">
+                </div>
+                
+                <label class="font-bold text-gray-600 block mb-1">Which answer is correct?</label>
+                <select id="correct-opt" class="w-full bg-white border-2 border-gray-300 p-3 rounded-xl font-black mb-4">
+                    <option value="0">🔺 Red is Correct</option>
+                    <option value="1">🔷 Blue is Correct</option>
+                    <option value="2">🟡 Yellow is Correct</option>
+                    <option value="3">🟩 Green is Correct</option>
+                </select>
+                
+                <button onclick="addQuestionToDraft()" class="w-full bg-indigo-100 text-brand-main font-black py-3 rounded-xl hover:bg-indigo-200 transition">+ Add Question to Quiz</button>
+            </div>
+            
+            <p id="draft-count" class="font-black text-brand-main mb-4 text-center">0 Questions Added</p>
+            
+            <div class="flex justify-end gap-4">
+                <button onclick="document.getElementById('create-modal').classList.add('hidden')" class="text-gray-500 font-bold px-6 py-3 hover:bg-gray-100 rounded-xl">Cancel</button>
+                <button onclick="saveNewSet()" class="bg-brand-main text-white font-black px-8 py-3 rounded-xl btn-push shadow-[0_4px_0_rgb(55,48,163)]">PUBLISH QUIZ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREMIUM GAME SCREEN -->
     <div id="game-screen" class="hidden fixed inset-0 z-[80] animated-bg flex flex-col">
-        <!-- HUD / Top Bar -->
+        <!-- HUD -->
         <div class="bg-white/10 backdrop-blur-md p-4 flex justify-between items-center z-10 border-b border-white/20 text-white">
             <div class="font-black uppercase tracking-widest text-sm bg-black/30 px-4 py-2 rounded-full">Score: <span id="player-score">0</span></div>
             <div class="w-14 h-14 rounded-full bg-purple-600 border-4 border-purple-400 flex items-center justify-center font-black text-2xl shadow-[0_0_15px_rgba(168,85,247,0.5)]" id="game-timer">30</div>
             <div class="font-black uppercase tracking-widest text-sm bg-black/30 px-4 py-2 rounded-full">🔥 Streak: <span id="player-streak">0</span></div>
         </div>
 
-        <!-- Question Area -->
         <div class="flex-1 flex flex-col items-center justify-center p-6 text-center">
-            <div class="bg-white/90 backdrop-blur-sm px-10 py-8 rounded-3xl shadow-2xl mb-12 max-w-5xl">
-                <h1 class="text-3xl md:text-5xl font-black text-gray-800 leading-tight" id="question-text">Which is the largest planet?</h1>
+            
+            <!-- Question Box -->
+            <div class="bg-white/90 backdrop-blur-sm px-10 py-6 rounded-3xl shadow-2xl mb-8 max-w-4xl w-full flex flex-col items-center">
+                <img id="question-image" src="" class="hidden max-h-48 rounded-xl mb-4 border-4 border-gray-200 object-cover">
+                <h1 class="text-3xl md:text-5xl font-black text-gray-800 leading-tight" id="question-text">Loading...</h1>
             </div>
             
-            <!-- Gamified 3D Answer Buttons -->
-            <div class="grid grid-cols-2 gap-4 w-full max-w-4xl h-80">
-                <button onclick="submitAnswer(0)" class="bg-kahoot-red text-white rounded-2xl shadow-[0_8px_0_#9f122a] btn-push flex flex-col items-center justify-center p-6 text-2xl font-bold hover:brightness-110">
-                    <span class="shape-icon">🔺</span> Jupiter
+            <!-- Answer Buttons Area -->
+            <div class="grid grid-cols-2 gap-4 w-full max-w-4xl h-80" id="answer-buttons-container">
+                <button id="btn-0" onclick="submitAnswer(0)" class="bg-kahoot-red text-white rounded-2xl shadow-[0_8px_0_#9f122a] btn-push flex flex-col items-center justify-center p-6 text-2xl font-bold">
+                    <span class="shape-icon">🔺</span> <span id="btn-text-0">Opt A</span>
                 </button>
-                <button onclick="submitAnswer(1)" class="bg-kahoot-blue text-white rounded-2xl shadow-[0_8px_0_#0d4991] btn-push flex flex-col items-center justify-center p-6 text-2xl font-bold hover:brightness-110">
-                    <span class="shape-icon">🔷</span> Mars
+                <button id="btn-1" onclick="submitAnswer(1)" class="bg-kahoot-blue text-white rounded-2xl shadow-[0_8px_0_#0d4991] btn-push flex flex-col items-center justify-center p-6 text-2xl font-bold">
+                    <span class="shape-icon">🔷</span> <span id="btn-text-1">Opt B</span>
                 </button>
-                <button onclick="submitAnswer(2)" class="bg-kahoot-yellow text-white rounded-2xl shadow-[0_8px_0_#976f00] btn-push flex flex-col items-center justify-center p-6 text-2xl font-bold hover:brightness-110">
-                    <span class="shape-icon">🟡</span> Earth
+                <button id="btn-2" onclick="submitAnswer(2)" class="bg-kahoot-yellow text-white rounded-2xl shadow-[0_8px_0_#976f00] btn-push flex flex-col items-center justify-center p-6 text-2xl font-bold">
+                    <span class="shape-icon">🟡</span> <span id="btn-text-2">Opt C</span>
                 </button>
-                <button onclick="submitAnswer(3)" class="bg-kahoot-green text-white rounded-2xl shadow-[0_8px_0_#1a6008] btn-push flex flex-col items-center justify-center p-6 text-2xl font-bold hover:brightness-110">
-                    <span class="shape-icon">🟩</span> Venus
+                <button id="btn-3" onclick="submitAnswer(3)" class="bg-kahoot-green text-white rounded-2xl shadow-[0_8px_0_#1a6008] btn-push flex flex-col items-center justify-center p-6 text-2xl font-bold">
+                    <span class="shape-icon">🟩</span> <span id="btn-text-3">Opt D</span>
                 </button>
             </div>
+
+            <!-- WAITING FOR OTHERS SCREEN (NEW) -->
+            <div id="wait-message" class="hidden w-full max-w-4xl h-80 flex flex-col items-center justify-center text-white bg-black/40 rounded-3xl backdrop-blur-md border border-white/20">
+                <div class="w-16 h-16 border-8 border-white border-t-transparent rounded-full loader-spin mb-6"></div>
+                <h2 class="text-4xl font-black mb-2">Answer Submitted!</h2>
+                <p class="text-xl font-bold opacity-90">Waiting for other participants...</p>
+            </div>
+
         </div>
     </div>
 
-    <!-- QUIZ CREATOR MODAL -->
-    <div id="create-modal" class="hidden fixed inset-0 z-[90] flex items-center justify-center bg-gray-900 bg-opacity-90 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl w-full max-w-lg animate-fade-in shadow-2xl p-8">
-            <h2 class="text-3xl font-black text-gray-800 mb-2">Create New Quiz</h2>
-            <input type="text" id="new-set-title" placeholder="Quiz Title" class="w-full bg-gray-100 border-2 border-gray-200 rounded-2xl px-6 py-4 font-bold text-xl mb-6 focus:border-brand-main outline-none">
-            <div class="flex justify-end gap-4"><button onclick="document.getElementById('create-modal').classList.add('hidden')" class="text-gray-500 font-bold px-6 py-3 hover:bg-gray-100 rounded-xl transition">Cancel</button><button onclick="saveNewSet()" class="bg-brand-main text-white font-black px-8 py-3 rounded-xl btn-push shadow-[0_4px_0_rgb(55,48,163)]">CREATE</button></div>
-        </div>
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="hidden fixed inset-0 z-[100] bg-gray-900 text-white flex flex-col items-center justify-center">
+        <h1 class="text-6xl mb-4">🏆</h1>
+        <h2 class="text-4xl font-black mb-2">Quiz Complete!</h2>
+        <h3 class="text-2xl text-gray-300 mb-6">Final Score</h3>
+        <div class="text-7xl font-black text-kahoot-yellow drop-shadow-[0_0_20px_rgba(255,166,2,0.5)] mb-10" id="final-score-display">0</div>
+        <button onclick="window.location.reload()" class="bg-white text-gray-900 px-8 py-4 rounded-xl font-black text-xl btn-push shadow-[0_4px_0_#ccc]">Back to Home</button>
     </div>
+
+    <!-- AUDIO SYSTEM -->
+    <audio id="sfx-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <audio id="sfx-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="sfx-wrong" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, addDoc, deleteDoc, setDoc, getDoc, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- SUPER ADMIN MASTER KEY ---
         const MASTER_USER = { id: 999, name: "Super Admin", user: "NEXORA", pass: "NEXORA@2027", role: "admin" };
         let cloudUsers = []; 
         let currentUser = null;
@@ -294,69 +296,51 @@
         const firebaseConfig = {
             apiKey: "AIzaSyD7HZMkzjcHmIqV7m4r6a_2T8dfmGzVm54",
             authDomain: "uniquiz-d3ddb.firebaseapp.com",
-            databaseURL: "https://uniquiz-d3ddb-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "uniquiz-d3ddb",
             storageBucket: "uniquiz-d3ddb.firebasestorage.app",
-            messagingSenderId: "504888829506",
-            appId: "1:504888829506:web:4a569b26414e74113c6fdb"
         };
 
         let app, auth, db, appId;
-        let fbUser = null;
+        
+        // Game Variables
+        let activeQuizData = null;
+        let currentQIndex = 0;
+        let draftQuestions = [];
+        let playerStreak = 0;
+        let playerScore = 0;
+        let timerInterval;
+        let timeLeft = 30;
+        let hasAnswered = false;
+        let selectedAnswerIndex = -1;
         let currentGameId = null;
-        let timerInterval = null;
-        let quizList = [ { title: "Biology 101" }, { title: "Math" } ];
+
         const AVATARS = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
         let selectedAvatar = '😎';
 
         async function initFirebase() {
-            try {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                appId = 'uniquiz-live';
-                await signInAnonymously(auth);
-                auth.onAuthStateChanged((u) => { 
-                    if(u) {
-                        fbUser = u;
-                        document.getElementById('db-status').textContent = "Cloud Connected ✅";
-                        document.getElementById('db-status').className = "text-green-500 text-xs font-bold text-center";
-                        
-                        // SYNC USERS
-                        onSnapshot(collection(db, 'global_users'), (snap) => {
-                            cloudUsers = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            if(currentUser) window.renderUserList();
-                        });
-                    }
-                });
-            } catch (err) {
-                console.warn("Connection Error:", err);
-                document.getElementById('db-status').textContent = "Offline Mode ❌";
-            }
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            appId = 'uniquiz-live';
+            await signInAnonymously(auth);
+            
+            onSnapshot(collection(db, 'global_users'), (snap) => {
+                cloudUsers = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if(currentUser) window.renderUserList();
+            });
+            // We do NOT load quizzes here anymore. We wait until login!
         }
         initFirebase(); 
 
-        // --- CLOUD AUTH SYSTEM ---
+        const playSound = (id) => { const a = document.getElementById(id); a.currentTime = 0; a.play().catch(e=>{}); };
 
+        // --- AUTH & RBAC ---
         window.attemptLogin = () => {
             const u = document.getElementById('login-user').value;
             const p = document.getElementById('login-pass').value;
-
-            // 1. Check Super Admin Master Key
-            if (u === MASTER_USER.user && p === MASTER_USER.pass) {
-                loginSuccess(MASTER_USER);
-                return;
-            }
-
-            // 2. Check Cloud Users
+            if (u === MASTER_USER.user && p === MASTER_USER.pass) return loginSuccess(MASTER_USER);
             const found = cloudUsers.find(user => user.user === u && user.pass === p);
-            if (found) {
-                loginSuccess(found);
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
-                document.getElementById('auth-screen').classList.add('animate-shake');
-                setTimeout(() => document.getElementById('auth-screen').classList.remove('animate-shake'), 500);
-            }
+            if (found) loginSuccess(found); else alert("Invalid Credentials");
         };
 
         function loginSuccess(user) {
@@ -367,192 +351,189 @@
             document.getElementById('user-name-display').textContent = currentUser.name;
             document.getElementById('user-role-display').textContent = currentUser.role === 'admin' ? 'System Administrator' : 'Faculty Member';
             document.getElementById('user-avatar').textContent = currentUser.name.substring(0,2).toUpperCase();
-            
-            // --- STRICT ROLE BASED ACCESS CONTROL (RBAC) ---
-            
-            // 1. Super Admin Danger Zone
-            if (currentUser.user === 'NEXORA') {
-                document.getElementById('super-admin-controls').classList.remove('hidden');
-            } else {
-                document.getElementById('super-admin-controls').classList.add('hidden');
-            }
 
-            // 2. Both Admins and Professors see the "Manage Faculty" tab so they can add users.
-            document.getElementById('admin-menu').classList.remove('hidden');
+            if (currentUser.user === 'NEXORA') document.getElementById('super-admin-controls').classList.remove('hidden');
+            if (currentUser.role === 'admin') document.getElementById('admin-menu').classList.remove('hidden');
             
-            // 3. Populate dropdown based on who is logged in
             const roleDropdown = document.getElementById('new-role');
             if (currentUser.role === 'admin') {
-                roleDropdown.innerHTML = `
-                    <option value="faculty">Professor (Standard)</option>
-                    <option value="admin">Developer (Admin)</option>
-                `;
+                roleDropdown.innerHTML = `<option value="faculty">Professor</option><option value="admin">Admin</option>`;
             } else {
-                roleDropdown.innerHTML = `
-                    <option value="faculty">Professor (Standard Only)</option>
-                `;
+                roleDropdown.innerHTML = `<option value="faculty">Professor (Standard)</option>`;
             }
-
+            
             window.renderUserList();
+            window.loadQuizzesFromDB(); // <--- LOAD QUIZZES SPECIFIC TO THIS ACCOUNT
             window.nav('library');
         }
 
-        window.logout = () => {
-            currentUser = null;
-            document.getElementById('app-layout').classList.add('hidden');
-            document.getElementById('auth-screen').classList.remove('hidden');
-            document.getElementById('login-user').value = '';
-            document.getElementById('login-pass').value = '';
-        };
-
-        // --- CLOUD USER MANAGEMENT ---
+        window.logout = () => window.location.reload();
 
         window.renderUserList = () => {
             const tbody = document.getElementById('user-list-body');
-            tbody.innerHTML = '';
-            
-            // Show Master User (Read-only)
-            tbody.innerHTML += `
-                <tr class="border-b border-gray-100 bg-purple-50">
-                    <td class="p-4 font-bold text-gray-800">${MASTER_USER.name}</td>
-                    <td class="p-4 text-sm font-mono text-gray-500">HIDDEN</td>
-                    <td class="p-4"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-black uppercase">SUPER ADMIN</span></td>
-                    <td class="p-4"><span class="text-gray-300 text-xs italic">Permanent</span></td>
-                </tr>
-            `;
-
-            // Show Cloud Users
+            tbody.innerHTML = `<tr class="border-b border-gray-100 bg-purple-50"><td class="p-4 font-bold text-gray-800">${MASTER_USER.name}</td><td class="p-4"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-black uppercase">SUPER ADMIN</span></td><td class="p-4">Permanent</td></tr>`;
             cloudUsers.forEach(u => {
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-100 hover:bg-gray-50";
-                
-                // ONLY Admins can delete users. Professors cannot see the delete button.
                 let deleteBtn = `<span class="text-gray-300 text-xs italic">No Access</span>`;
-                if (currentUser.role === 'admin') {
-                    deleteBtn = `<button onclick="deleteCloudUser('${u.id}')" class="text-red-500 font-bold text-xs hover:underline">Revoke Access</button>`;
-                }
-
-                const roleBadge = u.role === 'admin' 
-                    ? `<span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-black uppercase">Dev</span>`
-                    : `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-black uppercase">Prof</span>`;
-
-                tr.innerHTML = `<td class="p-4 font-bold text-gray-800">${u.name}</td><td class="p-4 text-sm font-mono text-gray-500">${u.user}</td><td class="p-4">${roleBadge}</td><td class="p-4">${deleteBtn}</td>`;
-                tbody.appendChild(tr);
+                if (currentUser.role === 'admin') deleteBtn = `<button onclick="deleteCloudUser('${u.id}')" class="text-red-500 font-bold text-xs">Revoke</button>`;
+                tbody.innerHTML += `<tr class="border-b border-gray-100 hover:bg-gray-50"><td class="p-4 font-bold">${u.name}</td><td class="p-4 text-xs font-black uppercase">${u.role}</td><td class="p-4">${deleteBtn}</td></tr>`;
             });
         };
 
         window.addCloudUser = async () => {
-            if(!db) { alert("Cannot add users: Database offline."); return; }
-            
+            if(!db) return;
             const name = document.getElementById('new-name').value;
             const user = document.getElementById('new-user').value;
             const pass = document.getElementById('new-pass').value;
             const role = document.getElementById('new-role').value;
 
-            // Strict Backend Check: Stop a sneaky professor from forcing an admin account
-            if (currentUser.role !== 'admin' && role === 'admin') {
-                alert("Permission Denied: Only Admins can create new Admins.");
-                return;
-            }
-
+            if (currentUser.role !== 'admin' && role === 'admin') return alert("Permission Denied!");
             if(name && user && pass) {
-                // Check if username taken
-                if(user === MASTER_USER.user || cloudUsers.some(u => u.user === user)) {
-                    alert("Username already taken!"); 
-                    return; 
-                }
-                
-                try {
-                    await addDoc(collection(db, 'global_users'), { name, user, pass, role, createdAt: Date.now() });
-                    document.getElementById('new-name').value = '';
-                    document.getElementById('new-user').value = '';
-                    document.getElementById('new-pass').value = '';
-                    alert(`User ${name} synced to Cloud!`);
-                } catch(e) { console.error(e); alert("Error saving to cloud."); }
-            } else {
-                alert("Please fill all fields.");
+                if(user === MASTER_USER.user || cloudUsers.some(u => u.user === user)) return alert("Username taken!");
+                await addDoc(collection(db, 'global_users'), { name, user, pass, role, createdAt: Date.now() });
+                document.getElementById('new-name').value = ''; document.getElementById('new-user').value = ''; document.getElementById('new-pass').value = '';
+                alert("User Synced!");
             }
         };
 
         window.deleteCloudUser = async (docId) => {
-            if (currentUser.role !== 'admin') {
-                alert("Permission Denied: Only Admins can revoke access.");
-                return;
-            }
-            if(confirm("Revoke access for this user? They will not be able to log in anywhere.")) {
-                try {
-                    await deleteDoc(doc(db, 'global_users', docId));
-                } catch(e) { console.error(e); alert("Error deleting user."); }
-            }
+            if (currentUser.role !== 'admin') return;
+            if(confirm("Revoke access?")) await deleteDoc(doc(db, 'global_users', docId));
         };
 
         window.wipeCloudUsers = async () => {
-            if (currentUser.user !== 'NEXORA') return; // Double verification
-            if(confirm("⚠️ CRITICAL WARNING ⚠️\n\nThis will permanently delete ALL users from Firebase. Are you absolutely sure?")) {
-                try {
-                    for (let u of cloudUsers) {
-                        await deleteDoc(doc(db, 'global_users', u.id));
-                    }
-                    alert("Database successfully wiped.");
-                } catch(e) { console.error(e); alert("Error wiping database."); }
+            if (currentUser.user !== 'NEXORA') return;
+            if(confirm("⚠️ WIPE ALL USERS?")) {
+                for (let u of cloudUsers) await deleteDoc(doc(db, 'global_users', u.id));
+                alert("Database wiped.");
             }
         };
 
-        // --- NAVIGATION & GAME ---
         window.nav = (view) => {
             document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('bg-indigo-50', 'text-brand-main'));
-            const link = document.getElementById(`nav-${view}`);
-            if(link) link.classList.add('bg-indigo-50', 'text-brand-main');
-
-            ['view-library', 'view-reports', 'view-users'].forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.classList.add('hidden');
-            });
+            document.getElementById(`nav-${view}`).classList.add('bg-indigo-50', 'text-brand-main');
+            ['view-library', 'view-reports', 'view-users'].forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById(`view-${view}`).classList.remove('hidden');
         };
 
-        window.saveNewSet = () => {
-            const t = document.getElementById('new-set-title').value;
-            if(t) { quizList.push({ title: t }); window.renderLibrary(); document.getElementById('create-modal').classList.add('hidden'); }
+        window.downloadCSV = () => {
+            let csv = "Student Name,Final Score,Date Played\nJohn Doe,4500,2026-08-08\nJane Smith,3200,2026-08-08\n";
+            let a = document.createElement('a');
+            a.href = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+            a.download = 'uniquiz_scores.csv';
+            a.click();
         };
 
-        window.renderLibrary = () => {
-            const grid = document.getElementById('quiz-grid');
-            grid.innerHTML = '';
-            quizList.forEach(q => {
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg transition flex flex-col justify-between h-64";
-                card.innerHTML = `<div class="h-24 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl mb-4 flex items-center justify-center text-4xl text-white">📝</div><h3 class="font-black text-lg mb-1 leading-tight">${q.title}</h3><button onclick="initiateHostSession('${q.title}')" class="w-full bg-brand-main text-white py-3 rounded-lg font-bold shadow-sm btn-push hover:bg-indigo-700 mt-auto">Host Live</button>`;
-                grid.appendChild(card);
+        // --- ACCOUNT-SPECIFIC QUIZ CREATOR & LIBRARY ---
+        window.openCreator = () => {
+            draftQuestions = [];
+            document.getElementById('draft-count').innerText = "0 Questions Added";
+            document.getElementById('new-set-title').value = "";
+            document.getElementById('create-modal').classList.remove('hidden');
+        };
+
+        window.addQuestionToDraft = () => {
+            const prompt = document.getElementById('q-prompt').value;
+            const img = document.getElementById('q-image').value;
+            const opts = [ document.getElementById('opt-0').value, document.getElementById('opt-1').value, document.getElementById('opt-2').value, document.getElementById('opt-3').value ];
+            const correct = parseInt(document.getElementById('correct-opt').value);
+
+            if (!prompt || opts.includes("")) return alert("Please fill out the question and all 4 options!");
+            draftQuestions.push({ question: prompt, image: img, options: opts, correct: correct });
+            document.getElementById('draft-count').innerText = `${draftQuestions.length} Questions Added`;
+            document.getElementById('q-prompt').value = ""; document.getElementById('q-image').value = "";
+            opts.forEach((_,i) => document.getElementById(`opt-${i}`).value = "");
+        };
+
+        window.saveNewSet = async () => {
+            const title = document.getElementById('new-set-title').value;
+            if(!title || draftQuestions.length === 0) return alert("Add a title and at least 1 question.");
+            
+            // TAG THE QUIZ WITH THE CURRENT USER'S ID
+            await addDoc(collection(db, 'global_quizzes'), { 
+                title: title, 
+                author: currentUser.name, 
+                authorUsername: currentUser.user, // <--- Key for personal storage
+                questions: draftQuestions 
+            });
+            
+            document.getElementById('create-modal').classList.add('hidden');
+        };
+
+        window.loadQuizzesFromDB = () => {
+            if(!db || !currentUser) return;
+            
+            onSnapshot(collection(db, 'global_quizzes'), (snap) => {
+                const grid = document.getElementById('quiz-grid');
+                grid.innerHTML = '';
+                
+                // FILTER: Only show quizzes made by this specific account (Super Admin sees all)
+                const myQuizzes = snap.docs.filter(docSnap => {
+                    const q = docSnap.data();
+                    return currentUser.user === 'NEXORA' || q.authorUsername === currentUser.user;
+                });
+
+                if (myQuizzes.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full text-center py-12"><h3 class="text-xl font-bold text-gray-400">No quizzes found.</h3><p class="text-gray-400 mb-4">You haven't created any quizzes yet!</p></div>`;
+                    return;
+                }
+
+                myQuizzes.forEach(docSnap => {
+                    const q = docSnap.data();
+                    
+                    // Add a delete button to the quiz card
+                    let deleteBtn = '';
+                    if (q.authorUsername === currentUser.user || currentUser.user === 'NEXORA') {
+                        deleteBtn = `<button onclick="deleteQuiz('${docSnap.id}')" class="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full font-black btn-push hover:bg-red-600 shadow-md">✕</button>`;
+                    }
+
+                    grid.innerHTML += `
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 h-64 flex flex-col justify-between relative">
+                        ${deleteBtn}
+                        <div class="h-24 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl mb-2 flex items-center justify-center text-4xl text-white">📝</div>
+                        <h3 class="font-black text-lg truncate">${q.title}</h3>
+                        <p class="text-xs text-gray-400 font-bold mb-2">By ${q.author}</p>
+                        <button onclick="initiateHostSession('${docSnap.id}')" class="w-full bg-brand-main text-white py-3 rounded-lg font-bold btn-push mt-auto">HOST LIVE</button>
+                    </div>`;
+                });
             });
         };
 
-        window.initiateHostSession = async (title) => {
-            if(!db || !fbUser) { alert("Multiplayer unavailable. (Firebase not connected)"); return; }
-            const pin = Math.floor(100000 + Math.random() * 900000).toString();
-            currentGameId = pin;
-            document.getElementById('host-lobby-screen').classList.remove('hidden');
-            document.getElementById('lobby-pin-display').textContent = pin;
-            try {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'games', pin), { host: currentUser.user, title: title, status: 'lobby', createdAt: Date.now() });
-                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'games', pin, 'players'), (snap) => {
-                    const players = snap.docs.map(d => d.data());
-                    document.getElementById('lobby-count').textContent = players.length;
-                    const grid = document.getElementById('lobby-player-grid');
-                    grid.innerHTML = '';
-                    players.forEach(p => { grid.innerHTML += `<div class="bg-white p-3 rounded-xl text-center w-24 animate-fade-in"><div class="text-3xl mb-1">${p.avatar}</div><div class="text-xs font-bold text-gray-800 truncate">${p.name}</div></div>`; });
-                });
-            } catch(e) { console.error("Host Error:", e); alert("Error creating room. Check console."); }
+        window.deleteQuiz = async (quizId) => {
+            if(confirm("Are you sure you want to permanently delete this quiz?")) {
+                try {
+                    await deleteDoc(doc(db, 'global_quizzes', quizId));
+                } catch(e) { console.error(e); alert("Error deleting quiz."); }
+            }
         };
 
-        window.startGame = async () => {
-            document.getElementById('host-lobby-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            if(db && currentGameId) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'games', currentGameId), { status: 'playing' }); }
-            let time = 30;
-            const el = document.getElementById('game-timer');
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => { time--; el.textContent = time; if(time<=0) clearInterval(timerInterval); }, 1000);
+        // --- TRUE MULTIPLAYER HOSTING ---
+        window.initiateHostSession = async (quizId) => {
+            if(!db || !auth.currentUser) return alert("Firebase not connected.");
+            const docRef = await getDoc(doc(db, 'global_quizzes', quizId));
+            activeQuizData = docRef.data().questions; 
+            
+            const pin = Math.floor(100000 + Math.random() * 900000).toString();
+            currentGameId = pin;
+            
+            document.getElementById('host-lobby-screen').classList.remove('hidden');
+            document.getElementById('lobby-pin-display').textContent = pin;
+            
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'games', pin), { 
+                host: currentUser.user, 
+                title: docRef.data().title, 
+                questions: activeQuizData, 
+                status: 'lobby', 
+                createdAt: Date.now() 
+            });
+            
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'games', pin, 'players'), (snap) => {
+                const players = snap.docs.map(d => d.data());
+                document.getElementById('lobby-count').textContent = players.length;
+                document.getElementById('lobby-player-grid').innerHTML = '';
+                players.forEach(p => { 
+                    document.getElementById('lobby-player-grid').innerHTML += `<div class="bg-white p-3 rounded-xl text-center w-24 animate-fade-in"><div class="text-3xl mb-1">${p.avatar}</div><div class="text-xs font-bold text-gray-800 truncate">${p.name}</div></div>`; 
+                });
+            });
         };
 
         window.toggleStudentJoin = () => document.getElementById('student-join-screen').classList.toggle('hidden');
@@ -574,58 +555,133 @@
                 grid.appendChild(d); 
             }); 
         };
-        
+
         window.joinGame = async () => { 
             const name = document.getElementById('player-name-input').value; 
             const pin = document.getElementById('game-pin-input').value; 
-            if(!db) return; 
-            try { 
-                const gameSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'games', pin)); 
-                if(gameSnap.exists()) { 
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'games', pin, 'players', fbUser.uid), { name, avatar: selectedAvatar, score: 0 }); 
-                    document.getElementById('student-join-screen').classList.add('hidden'); 
-                    document.getElementById('player-waiting-screen').classList.remove('hidden'); 
-                    document.getElementById('waiting-avatar-display').textContent = selectedAvatar; 
-                    document.getElementById('player-wait-pin').textContent = "PIN: " + pin; 
-                    
-                    onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'games', pin), (d) => { 
-                        if(d.data().status === 'playing') { 
-                            document.getElementById('player-waiting-screen').classList.add('hidden'); 
-                            document.getElementById('game-screen').classList.remove('hidden'); 
-                        } 
-                    }); 
-                } else { 
-                    alert("Invalid PIN"); 
-                } 
-            } catch(e) { console.error(e); } 
-        };
-
-        // --- UPGRADED GAMIFIED SUBMISSION LOGIC ---
-        let localStreak = 0;
-        let localScore = 0;
-        
-        window.submitAnswer = (idx) => { 
-            localStreak++;
-            localScore += 1000 + (localStreak * 100);
-            document.getElementById('player-score').textContent = localScore;
-            document.getElementById('player-streak').textContent = localStreak;
+            if(!db || !name || !pin) return; 
             
-            const gameScreen = document.getElementById('game-screen');
-            gameScreen.style.animation = "none";
-            gameScreen.style.background = "#26890c"; 
-            
-            setTimeout(() => {
-                gameScreen.style.animation = "gradientBG 15s ease infinite";
-                gameScreen.style.background = ""; 
-            }, 300);
-
-            if(db && currentGameId) { 
-                updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'games', currentGameId, 'players', fbUser.uid), { 
-                    score: increment(100) 
+            const gameSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'games', pin)); 
+            if(gameSnap.exists()) { 
+                activeQuizData = gameSnap.data().questions; 
+                currentGameId = pin;
+                
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'games', pin, 'players', auth.currentUser.uid), { name, avatar: selectedAvatar, score: 0 }); 
+                
+                document.getElementById('student-join-screen').classList.add('hidden'); 
+                document.getElementById('player-waiting-screen').classList.remove('hidden'); 
+                document.getElementById('waiting-avatar-display').textContent = selectedAvatar; 
+                document.getElementById('player-wait-pin').textContent = "PIN: " + pin; 
+                
+                onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'games', pin), (d) => { 
+                    if(d.data().status === 'playing' && document.getElementById('player-waiting-screen').classList.contains('hidden') === false) { 
+                        document.getElementById('player-waiting-screen').classList.add('hidden'); 
+                        document.getElementById('game-screen').classList.remove('hidden'); 
+                        currentQIndex = 0; playerScore = 0; playerStreak = 0;
+                        loadQuestionUI();
+                    } 
                 }); 
+            } else { 
+                alert("Invalid PIN"); 
             } 
         };
 
+        window.startGame = async () => {
+            document.getElementById('host-lobby-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            if(db && currentGameId) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'games', currentGameId), { status: 'playing' });
+            
+            currentQIndex = 0; playerScore = 0; playerStreak = 0;
+            loadQuestionUI();
+        };
+
+        // --- GAMEPLAY SYNC ENGINE ---
+        function loadQuestionUI() {
+            hasAnswered = false;
+            selectedAnswerIndex = -1;
+            
+            const q = activeQuizData[currentQIndex];
+            const imgEl = document.getElementById('question-image');
+            if(q.image) { imgEl.src = q.image; imgEl.classList.remove('hidden'); } else { imgEl.classList.add('hidden'); }
+            document.getElementById('question-text').innerText = q.question;
+            
+            document.getElementById('wait-message').classList.add('hidden');
+            document.getElementById('answer-buttons-container').classList.remove('hidden');
+            document.getElementById('game-screen').style.background = ""; 
+
+            for(let i=0; i<4; i++) {
+                document.getElementById(`btn-text-${i}`).innerText = q.options[i];
+                document.getElementById(`btn-${i}`).classList.remove('btn-locked');
+                document.getElementById(`btn-${i}`).style.transform = "none";
+            }
+            
+            timeLeft = 30;
+            document.getElementById('game-timer').innerText = timeLeft;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('game-timer').innerText = timeLeft;
+                if(timeLeft <= 0) handleTimeOut();
+            }, 1000);
+        }
+
+        window.submitAnswer = (idx) => {
+            if(hasAnswered) return;
+            hasAnswered = true;
+            selectedAnswerIndex = idx;
+            playSound('sfx-click');
+
+            // HIDE BUTTONS & SHOW LOADING SPINNER
+            document.getElementById('answer-buttons-container').classList.add('hidden');
+            document.getElementById('wait-message').classList.remove('hidden');
+        };
+
+        function handleTimeOut() {
+            clearInterval(timerInterval);
+            const q = activeQuizData[currentQIndex];
+            
+            document.getElementById('wait-message').classList.add('hidden');
+            document.getElementById('answer-buttons-container').classList.remove('hidden');
+
+            if (selectedAnswerIndex === q.correct) {
+                playSound('sfx-correct');
+                playerStreak++;
+                playerScore += 1000 + (playerStreak * 100);
+                document.getElementById('game-screen').style.background = "#26890c"; 
+            } else {
+                playSound('sfx-wrong');
+                playerStreak = 0;
+                document.getElementById('game-screen').style.background = "#e21b3c"; 
+            }
+
+            document.getElementById('player-score').innerText = playerScore;
+            document.getElementById('player-streak').innerText = playerStreak;
+            
+            for(let i=0; i<4; i++) {
+                const btn = document.getElementById(`btn-${i}`);
+                btn.classList.add('btn-locked');
+                if(i === q.correct) {
+                    btn.classList.remove('btn-locked');
+                    btn.style.transform = "scale(1.05)";
+                }
+            }
+
+            if(db && currentGameId && auth.currentUser) {
+                updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'games', currentGameId, 'players', auth.currentUser.uid), { score: playerScore }).catch(e=>{});
+            }
+
+            setTimeout(() => {
+                currentQIndex++;
+                if (currentQIndex < activeQuizData.length) {
+                    loadQuestionUI();
+                } else {
+                    document.getElementById('game-screen').classList.add('hidden');
+                    document.getElementById('result-screen').classList.remove('hidden');
+                    document.getElementById('final-score-display').innerText = playerScore;
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                }
+            }, 3000);
+        }
     </script>
   </body>
 </html>
