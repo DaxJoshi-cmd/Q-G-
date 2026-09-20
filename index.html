@@ -370,7 +370,7 @@
       </footer>
     </div>
 
-    <!-- HOST BROADCAST & TELEMETRY CHARTS -->
+    <!-- HOST BROADCAST & TELEMETRY CHARTS (WITH PHASE 5 LIVE PACING CURVE) -->
     <div id="host-game-screen" class="hidden fixed inset-0 z-[80] bg-obsidian-950 flex flex-col justify-between p-8 lg:p-12">
       <div class="absolute top-0 left-0 right-0 h-1.5 bg-obsidian-850">
         <div id="timer-progress-bar" class="h-full bg-white timer-bar" style="width: 100%;"></div>
@@ -406,8 +406,25 @@
         <img id="host-question-image" src="" alt="" class="hidden max-h-52 rounded-xl mb-4 border border-obsidian-800 object-contain shadow-2xl">
         <div class="text-2xl lg:text-4xl font-bold tracking-tight text-white mb-6 leading-relaxed max-w-3xl" id="host-question-text">Loading Question...</div>
 
+        <!-- PHASE 5: Live Pacing Curve / Velocity Histogram (Visible during question phase) -->
+        <div id="host-pacing-histogram" class="w-full max-w-xl mb-6 p-4 rounded-xl bg-obsidian-900 border border-obsidian-800 font-mono">
+          <div class="flex justify-between items-center text-[10px] text-obsidian-400 mb-2 uppercase tracking-wider">
+            <span>⚡ Live Submission Velocity</span>
+            <span id="pacing-status-text">Waiting for input...</span>
+          </div>
+          <div class="flex items-end gap-1.5 h-16 w-full pt-2 border-b border-obsidian-800" id="pacing-bars-container">
+            <!-- Dynamically populated 10-second slice bins -->
+          </div>
+          <div class="flex justify-between text-[9px] text-obsidian-500 mt-1">
+            <span>Start (0s)</span>
+            <span>Midpoint</span>
+            <span>Buzzer</span>
+          </div>
+        </div>
+
         <div id="host-accuracy-badge" class="hidden mb-6 px-4 py-1.5 rounded-full font-mono text-xs font-bold inline-flex items-center gap-2 border"></div>
 
+        <!-- Bar Charts (Revealed after answers) -->
         <div id="host-bar-charts" class="hidden flex items-end justify-center gap-6 h-64 w-full bg-obsidian-900 border border-obsidian-800 p-8 rounded-2xl">
           <div class="flex flex-col items-center justify-end h-full w-28">
             <div id="bar-0" class="bar-height-anim w-full bg-arcade-red rounded-t-lg" style="height: 0%"></div>
@@ -725,6 +742,9 @@
       let liveAnswersCount = 0;
       let currentAnswers = { 0:0, 1:0, 2:0, 3:0 };
 
+      // Phase 5: Live Pacing Histogram bins (6 slices of 5 seconds or dynamic ratio)
+      let livePacingBins = [0, 0, 0, 0, 0, 0];
+
       let playerStreak = 0;
       let playerScore = 0;
       let hasAnswered = false;
@@ -736,9 +756,6 @@
       const AVATARS = ['▲', '◆', '●', '■', '✦', '❖', '⚙', '★'];
       let selectedAvatar = '▲';
 
-      // ==========================================
-      // STOCKFISH HEURISTIC SECURITY EVALUATOR (0-5)
-      // ==========================================
       const StockfishSecurityEngine = {
         evaluateMove(context) {
           let score = 0;
@@ -1047,7 +1064,7 @@
         const img = document.getElementById('q-image').value.trim();
         let opts = type === 4
           ? [document.getElementById('opt-0').value, document.getElementById('opt-1').value, document.getElementById('opt-2').value, document.getElementById('opt-3').value]
-          : [document.getElementById('opt-0').value, document.getElementById('opt-1'].value];
+          : [document.getElementById('opt-0').value, document.getElementById('opt-1').value];
         const correct = parseInt(document.getElementById('correct-opt').value);
 
         if (!prompt || opts.includes("")) return alert("Please populate all inputs.");
@@ -1185,7 +1202,6 @@
           status: 'lobby', qIndex: 0, createdAt: Date.now()
         });
 
-        // Initialize admin security emergency radar listener for this game
         window.initSecurityRadarListener(currentGameId);
 
         onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'games', currentGameId, 'players'), (snap) => {
@@ -1198,6 +1214,9 @@
           liveAnswersCount = 0;
           currentAnswers = { 0:0, 1:0, 2:0, 3:0 };
           let elevatedThreatCount = 0;
+
+          // Phase 5: Reset and compute live pacing bins based on responses received
+          livePacingBins = [0, 0, 0, 0, 0, 0];
 
           cachedActivePlayers.forEach(p => {
             const threatLevel = p.threatLevel || 0;
@@ -1223,9 +1242,16 @@
               liveAnswersCount++;
               currentAnswers[p.currentAnswer]++;
             }
+
+            // Populate pacing bins if response duration is recorded
+            if (p.responseDuration !== undefined && p.responseDuration > 0) {
+              const binIndex = Math.min(5, Math.floor((p.responseDuration / hostTotalDuration) * 6));
+              livePacingBins[binIndex]++;
+            }
           });
 
           document.getElementById('host-answer-count').textContent = liveAnswersCount;
+          window.renderHostPacingHistogram();
 
           const summaryBadge = document.getElementById('host-security-summary');
           if (summaryBadge) {
@@ -1242,7 +1268,29 @@
         });
       };
 
-      // Admin Emergency Escalation Listener (Levels 4-5)
+      // Phase 5: Render Host Pacing Histogram
+      window.renderHostPacingHistogram = () => {
+        const container = document.getElementById('pacing-bars-container');
+        if (!container) return;
+        const maxBin = Math.max(1, ...livePacingBins);
+        const statusText = document.getElementById('pacing-status-text');
+
+        if (liveAnswersCount === 0) {
+          statusText.innerText = "Awaiting submissions...";
+        } else {
+          statusText.innerText = `${liveAnswersCount} locked in`;
+        }
+
+        container.innerHTML = livePacingBins.map((count, i) => {
+          const heightPct = Math.round((count / maxBin) * 100);
+          return `
+            <div class="flex-1 flex flex-col items-center justify-end h-full">
+              <div class="w-full bg-blue-500 rounded-t transition-all duration-300" style="height: ${heightPct}%" title="${count} responses"></div>
+            </div>
+          `;
+        }).join('');
+      };
+
       window.initSecurityRadarListener = (gameId) => {
         onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'games', gameId, 'security_alerts'), (snapshot) => {
           snapshot.docChanges().forEach((change) => {
@@ -1298,7 +1346,6 @@
             status: 'COUNTERMEASURE_DEPLOYED'
           });
 
-          // Deploy Poison Pill data-corruption payload
           await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'games', currentGameId, 'players', targetUid), {
             threatLevel: 5,
             isPoisoned: true,
@@ -1358,6 +1405,7 @@
         hostTimeLeft = hostTotalDuration;
         isTimerPaused = false;
         questionOpenedTimestamp = Date.now();
+        livePacingBins = [0, 0, 0, 0, 0, 0];
 
         updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'games', currentGameId), {
           status: 'question', 
@@ -1381,6 +1429,7 @@
 
         document.getElementById('host-accuracy-badge').classList.add('hidden');
         document.getElementById('host-bar-charts').classList.add('hidden');
+        document.getElementById('host-pacing-histogram').classList.remove('hidden');
         document.getElementById('host-btn-reveal').classList.remove('hidden');
         document.getElementById('host-btn-next').classList.add('hidden');
         document.getElementById('host-btn-end').classList.add('hidden');
@@ -1467,6 +1516,7 @@
         const targetLabel = document.getElementById(`label-${q.correct}`);
         if (targetLabel) targetLabel.innerText += " (CORRECT)";
 
+        document.getElementById('host-pacing-histogram').classList.add('hidden');
         document.getElementById('host-bar-charts').classList.remove('hidden');
         const max = Math.max(1, livePlayerCount);
         for (let i = 0; i < 4; i++) {
@@ -1668,7 +1718,6 @@
         myThreatScore = Math.max(myThreatScore, moveEvaluation.threatLevel);
         myThreatLogs.push(moveEvaluation);
 
-        // If level 4 or 5 is reached, escalate to admin command center
         if (myThreatScore >= 4) {
           await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'games', currentGameId, 'security_alerts'), {
             alertId: Math.random().toString(36).substring(7),
