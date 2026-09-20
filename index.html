@@ -12,8 +12,21 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Lightweight Client-Side QR Generator -->
+    <!-- QR Code Generator -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- KaTeX Math Engine -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Prism Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
 
     <script>
       tailwind.config = {
@@ -80,7 +93,6 @@
         filter: grayscale(70%);
       }
 
-      /* Smooth Transitions */
       .bar-height-anim {
         transition: height 0.75s cubic-bezier(0.16, 1, 0.3, 1);
       }
@@ -91,14 +103,12 @@
         transition: width 1s linear;
       }
 
-      /* Minimal Loader */
       .minimal-spinner {
         border-top-color: transparent;
         animation: spin 0.75s linear infinite;
       }
       @keyframes spin { to { transform: rotate(360deg); } }
 
-      /* Tactile Grain Filter */
       .canvas-noise {
         position: fixed;
         inset: 0;
@@ -106,6 +116,22 @@
         z-index: 9999;
         opacity: 0.03;
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      /* Code block adjustments for dark UI */
+      pre[class*="language-"] {
+        margin: 0.5rem 0 !important;
+        border-radius: 0.75rem !important;
+        background: #0B0D12 !important;
+        border: 1px solid #1F2430 !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 0.82rem !important;
+      }
+      code[class*="language-"] {
+        font-family: 'JetBrains Mono', monospace !important;
+      }
+      .katex-display {
+        margin: 0.75rem 0 !important;
       }
     </style>
   </head>
@@ -195,7 +221,7 @@
     <div id="player-waiting-screen" class="hidden fixed inset-0 z-[65] flex flex-col items-center justify-center p-6 bg-obsidian-950 text-center">
       <div class="w-24 h-24 rounded-2xl bg-obsidian-900 border border-obsidian-800 flex items-center justify-center text-4xl mb-6 shadow-2xl font-mono text-white" id="waiting-avatar-display">▲</div>
       <h2 class="text-3xl font-bold tracking-tight text-white mb-2">Connected to Broadcast</h2>
-      <p class="text-sm text-obsidian-400 max-w-sm mb-6">Instructor console is currently in lobby phase. Questions will appear here automatically.</p>
+      <p class="text-sm text-obsidian-400 max-w-sm mb-6">Instructor console is currently in lobby phase. STEM questions will render on your display automatically.</p>
       <div class="px-4 py-1.5 rounded-full bg-obsidian-900 border border-obsidian-800 font-mono text-xs text-obsidian-400" id="player-wait-pin">ROOM: ------</div>
     </div>
 
@@ -238,14 +264,14 @@
           <div class="flex items-center justify-between pb-6 mb-8 border-b border-obsidian-850">
             <div>
               <h2 class="text-2xl font-bold tracking-tight text-white">Course Question Sets</h2>
-              <p class="text-xs text-obsidian-400">Modules registered to this identity</p>
+              <p class="text-xs text-obsidian-400">Modules registered to this identity (Supports LaTeX & Code syntax)</p>
             </div>
             <button onclick="openCreator()" class="px-4 py-2.5 bg-white hover:bg-slate-200 text-obsidian-950 text-xs font-bold uppercase tracking-wider rounded-xl transition arcade-key shadow-[0_3px_0_#94A3B8]">+ Create Module</button>
           </div>
           <div id="quiz-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
-        <!-- REPORTS TAB (LIVE TELEMETRY SESSIONS) -->
+        <!-- REPORTS TAB -->
         <div id="view-reports" class="hidden">
           <div class="flex items-center justify-between pb-6 mb-8 border-b border-obsidian-850">
             <div>
@@ -255,7 +281,6 @@
             <button onclick="exportAllReportsCSV()" class="px-4 py-2.5 bg-arcade-green hover:bg-emerald-500 text-obsidian-950 text-xs font-bold uppercase tracking-wider rounded-xl transition arcade-key shadow-[0_3px_0_#009E5C]">Download All Telemetry (CSV)</button>
           </div>
 
-          <!-- Reports Container -->
           <div id="reports-ledger-container" class="space-y-4">
             <div class="p-8 border rounded-2xl bg-obsidian-900 border-obsidian-800 text-center">
               <p class="text-xs font-mono text-obsidian-400">Querying session history...</p>
@@ -297,7 +322,7 @@
       </main>
     </div>
 
-    <!-- HOST ROOM DISPLAY (STAGE / PROJECTOR VIEW WITH DYNAMIC QR) -->
+    <!-- HOST ROOM DISPLAY -->
     <div id="host-lobby-screen" class="hidden fixed inset-0 z-[70] bg-obsidian-950 flex flex-col justify-between p-8 lg:p-14">
       <header class="flex items-start justify-between">
         <div>
@@ -326,14 +351,12 @@
       </footer>
     </div>
 
-    <!-- HOST BROADCAST & TELEMETRY CHARTS (WITH ACCURACY & DIFFICULTY AUDIT) -->
+    <!-- HOST BROADCAST & TELEMETRY CHARTS (WITH STEM RENDERING) -->
     <div id="host-game-screen" class="hidden fixed inset-0 z-[80] bg-obsidian-950 flex flex-col justify-between p-8 lg:p-12">
-      <!-- Progress Bar -->
       <div class="absolute top-0 left-0 right-0 h-1.5 bg-obsidian-850">
         <div id="timer-progress-bar" class="h-full bg-white timer-bar" style="width: 100%;"></div>
       </div>
 
-      <!-- Header HUD -->
       <header class="flex items-center justify-between pb-6 border-b border-obsidian-850 font-mono mt-2">
         <div class="flex items-center gap-3">
           <span class="text-xs text-obsidian-400 font-semibold uppercase">Live Transmission</span>
@@ -353,12 +376,12 @@
         <div class="w-12 h-12 rounded-xl border border-obsidian-750 bg-obsidian-900 flex items-center justify-center text-xl font-bold text-white font-mono" id="host-timer">30</div>
       </header>
 
-      <!-- Center Question Box -->
+      <!-- Center Question Box with STEM rendering container -->
       <main class="flex-1 flex flex-col items-center justify-center max-w-4xl mx-auto w-full text-center py-4">
         <img id="host-question-image" src="" alt="" class="hidden max-h-52 rounded-xl mb-4 border border-obsidian-800 object-contain shadow-2xl">
-        <h2 class="text-3xl lg:text-5xl font-bold tracking-tight text-white mb-6 leading-snug" id="host-question-text">Loading Question...</h2>
+        <div class="text-2xl lg:text-4xl font-bold tracking-tight text-white mb-6 leading-relaxed max-w-3xl" id="host-question-text">Loading Question...</div>
 
-        <!-- Difficulty / Comprehension Diagnostic Badge -->
+        <!-- Difficulty Diagnostic Badge -->
         <div id="host-accuracy-badge" class="hidden mb-6 px-4 py-1.5 rounded-full font-mono text-xs font-bold inline-flex items-center gap-2 border"></div>
 
         <!-- Bar Charts -->
@@ -386,7 +409,6 @@
         </div>
       </main>
 
-      <!-- Broadcast Actions -->
       <footer class="flex justify-end gap-3 pt-6 border-t border-obsidian-850">
         <button id="host-btn-reveal" onclick="hostRevealAnswer()" class="px-8 py-3 bg-arcade-amber hover:bg-amber-400 text-obsidian-950 font-bold text-xs uppercase tracking-wider rounded-xl arcade-key shadow-[0_3px_0_#C98200]">REVEAL DISTRIBUTION</button>
         <button id="host-btn-next" onclick="hostNextQuestion()" class="hidden px-8 py-3 bg-white hover:bg-slate-100 text-obsidian-950 font-bold text-xs uppercase tracking-wider rounded-xl arcade-key shadow-[0_3px_0_#94A3B8]">NEXT QUESTION →</button>
@@ -445,19 +467,19 @@
       <div id="answer-buttons-container" class="hidden grid grid-cols-2 gap-3.5 h-[55vh] max-w-3xl mx-auto w-full">
         <button id="btn-0" onclick="submitAnswer(0)" class="arcade-key bg-arcade-red hover:bg-rose-600 text-white rounded-2xl flex flex-col items-center justify-center p-6 shadow-[0_6px_0_#C71B3A]">
           <span class="text-4xl mb-1">▲</span>
-          <span class="text-[10px] font-mono tracking-widest uppercase opacity-80">Option 1 [Key: 1 / A]</span>
+          <span class="text-[10px] font-mono tracking-widest uppercase opacity-80" id="btn-0-text">Option 1 [Key: 1 / A]</span>
         </button>
         <button id="btn-1" onclick="submitAnswer(1)" class="arcade-key bg-arcade-blue hover:bg-blue-600 text-white rounded-2xl flex flex-col items-center justify-center p-6 shadow-[0_6px_0_#0D4EC7]">
           <span class="text-4xl mb-1">◆</span>
-          <span class="text-[10px] font-mono tracking-widest uppercase opacity-80">Option 2 [Key: 2 / B]</span>
+          <span class="text-[10px] font-mono tracking-widest uppercase opacity-80" id="btn-1-text">Option 2 [Key: 2 / B]</span>
         </button>
         <button id="btn-2" onclick="submitAnswer(2)" class="arcade-key bg-arcade-amber hover:bg-amber-500 text-white rounded-2xl flex flex-col items-center justify-center p-6 shadow-[0_6px_0_#C98200]">
           <span class="text-4xl mb-1">●</span>
-          <span class="text-[10px] font-mono tracking-widest uppercase opacity-80">Option 3 [Key: 3 / C]</span>
+          <span class="text-[10px] font-mono tracking-widest uppercase opacity-80" id="btn-2-text">Option 3 [Key: 3 / C]</span>
         </button>
         <button id="btn-3" onclick="submitAnswer(3)" class="arcade-key bg-arcade-green hover:bg-emerald-500 text-white rounded-2xl flex flex-col items-center justify-center p-6 shadow-[0_6px_0_#009E5C]">
           <span class="text-4xl mb-1">■</span>
-          <span class="text-[10px] font-mono tracking-widest uppercase opacity-80">Option 4 [Key: 4 / D]</span>
+          <span class="text-[10px] font-mono tracking-widest uppercase opacity-80" id="btn-3-text">Option 4 [Key: 4 / D]</span>
         </button>
       </div>
 
@@ -486,11 +508,14 @@
       <button onclick="window.location.reload()" class="px-8 py-3.5 bg-white text-obsidian-950 font-bold text-xs uppercase tracking-wider rounded-xl arcade-key shadow-[0_3px_0_#94A3B8]">RETURN TO LOBBY</button>
     </div>
 
-    <!-- QUIZ CREATOR MODAL -->
+    <!-- QUIZ CREATOR MODAL WITH STEM INSERT BUTTONS & LIVE PREVIEW -->
     <div id="create-modal" class="hidden fixed inset-0 z-[90] flex items-center justify-center p-4 bg-obsidian-950/95 backdrop-blur-md">
-      <div class="w-full max-w-xl p-8 border rounded-2xl bg-obsidian-900 border-obsidian-800 max-h-[90vh] overflow-y-auto">
+      <div class="w-full max-w-2xl p-8 border rounded-2xl bg-obsidian-900 border-obsidian-800 max-h-[90vh] overflow-y-auto">
         <header class="flex justify-between items-center mb-6">
-          <h2 class="text-lg font-bold text-white">Module Configuration</h2>
+          <div>
+            <h2 class="text-lg font-bold text-white">Module Configuration</h2>
+            <p class="text-xs text-obsidian-400">Supports KaTeX Math ($...$) and Code Blocks (```python ... ```)</p>
+          </div>
           <button onclick="document.getElementById('create-modal').classList.add('hidden')" class="text-obsidian-400 hover:text-white">✕</button>
         </header>
 
@@ -517,14 +542,30 @@
             </div>
           </div>
 
-          <input type="text" id="q-prompt" placeholder="Question Prompt" class="w-full px-3 py-2 bg-obsidian-900 border border-obsidian-750 rounded-lg text-xs text-white">
+          <!-- STEM Snippet Helper Toolbar -->
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-[11px] font-mono uppercase text-obsidian-400 font-semibold">Question Prompt</span>
+            <div class="flex items-center gap-1.5 font-mono text-[10px]">
+              <button type="button" onclick="insertSTEMTemplate('math')" class="px-2 py-0.5 rounded bg-obsidian-750 text-obsidian-300 hover:text-white border border-obsidian-700">+ Math ($...$)</button>
+              <button type="button" onclick="insertSTEMTemplate('code')" class="px-2 py-0.5 rounded bg-obsidian-750 text-obsidian-300 hover:text-white border border-obsidian-700">+ Python Block</button>
+            </div>
+          </div>
+
+          <textarea id="q-prompt" rows="3" oninput="updateCreatorLivePreview()" placeholder="Enter question or formula (e.g. What is the derivative of $f(x) = x^2$?\n```python\nprint('Hello World')\n```)" class="w-full px-3 py-2 bg-obsidian-900 border border-obsidian-750 rounded-lg text-xs text-white font-mono"></textarea>
+          
+          <!-- Real-Time STEM Live Preview Box -->
+          <div class="p-3.5 rounded-xl border border-obsidian-800 bg-obsidian-950 text-left">
+            <div class="text-[10px] font-mono uppercase tracking-wider text-obsidian-400 mb-1 font-semibold">Live Rendering Preview:</div>
+            <div id="creator-stem-preview" class="text-xs text-white leading-relaxed">Type prompt above to preview LaTeX math and syntax highlighting...</div>
+          </div>
+
           <input type="text" id="q-image" placeholder="Image URL (Optional)" class="w-full px-3 py-2 bg-obsidian-900 border border-obsidian-750 rounded-lg text-xs text-white">
 
           <div class="grid grid-cols-2 gap-2" id="options-container">
-            <input type="text" id="opt-0" placeholder="▲ Option 1 (Red)" class="px-3 py-2 bg-obsidian-900 border border-rose-900/50 rounded-lg text-xs text-white">
-            <input type="text" id="opt-1" placeholder="◆ Option 2 (Blue)" class="px-3 py-2 bg-obsidian-900 border border-blue-900/50 rounded-lg text-xs text-white">
-            <input type="text" id="opt-2" placeholder="● Option 3 (Amber)" class="px-3 py-2 bg-obsidian-900 border border-amber-900/50 rounded-lg text-xs text-white">
-            <input type="text" id="opt-3" placeholder="■ Option 4 (Green)" class="px-3 py-2 bg-obsidian-900 border border-emerald-900/50 rounded-lg text-xs text-white">
+            <input type="text" id="opt-0" placeholder="▲ Option 1 (e.g. $2x$)" class="px-3 py-2 bg-obsidian-900 border border-rose-900/50 rounded-lg text-xs text-white">
+            <input type="text" id="opt-1" placeholder="◆ Option 2 (e.g. $x$)" class="px-3 py-2 bg-obsidian-900 border border-blue-900/50 rounded-lg text-xs text-white">
+            <input type="text" id="opt-2" placeholder="● Option 3 (e.g. $x^2$)" class="px-3 py-2 bg-obsidian-900 border border-amber-900/50 rounded-lg text-xs text-white">
+            <input type="text" id="opt-3" placeholder="■ Option 4 (e.g. $2$)" class="px-3 py-2 bg-obsidian-900 border border-emerald-900/50 rounded-lg text-xs text-white">
           </div>
 
           <div>
@@ -614,6 +655,71 @@
       const AVATARS = ['▲', '◆', '●', '■', '✦', '❖', '⚙', '★'];
       let selectedAvatar = '▲';
 
+      // --- STEM RENDERING ENGINE (KaTeX + Prism) ---
+      window.renderSTEMToElement = (element, rawText) => {
+        if (!element) return;
+        if (!rawText) {
+          element.innerHTML = '';
+          return;
+        }
+
+        // 1. Extract and convert Markdown Code Blocks (```lang ... ```)
+        let processed = String(rawText).replace(/```(\w*)\n?([\s\S]*?)```/g, (match, lang, code) => {
+          const validLang = (lang || 'javascript').toLowerCase();
+          const cleanCode = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          return `<pre class="language-${validLang}"><code class="language-${validLang}">${cleanCode.trim()}</code></pre>`;
+        });
+
+        // 2. Extract inline backticks `code`
+        processed = processed.replace(/`([^`]+)`/g, (match, inlineCode) => {
+          const clean = inlineCode.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          return `<code class="px-1.5 py-0.5 rounded bg-obsidian-800 text-amber-300 font-mono text-[11px]">${clean}</code>`;
+        });
+
+        element.innerHTML = processed;
+
+        // 3. Render KaTeX Formulas ($math$ and $$math$$)
+        if (window.renderMathInElement) {
+          try {
+            renderMathInElement(element, {
+              delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false }
+              ],
+              throwOnError: false
+            });
+          } catch (e) {
+            console.warn("KaTeX rendering error:", e);
+          }
+        }
+
+        // 4. Highlight Code Blocks with Prism
+        if (window.Prism) {
+          try {
+            Prism.highlightAllUnder(element);
+          } catch (e) {
+            console.warn("Prism highlight error:", e);
+          }
+        }
+      };
+
+      window.updateCreatorLivePreview = () => {
+        const promptInput = document.getElementById('q-prompt').value;
+        const previewEl = document.getElementById('creator-stem-preview');
+        window.renderSTEMToElement(previewEl, promptInput || "Type prompt above to preview LaTeX math and syntax highlighting...");
+      };
+
+      window.insertSTEMTemplate = (type) => {
+        const area = document.getElementById('q-prompt');
+        if (type === 'math') {
+          area.value += " What is the integral $$\\int x^2 dx$$?";
+        } else if (type === 'code') {
+          area.value += "\n```python\ndef solve(x):\n    return x * 2\n```\n";
+        }
+        window.updateCreatorLivePreview();
+        area.focus();
+      };
+
       async function initFirebase() {
         app = initializeApp(firebaseConfig);
         auth = getAuth(app);
@@ -625,13 +731,11 @@
           if (currentUser) window.renderUserList();
         });
 
-        // Initialize Live Session Reports Listener
         onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'game_reports'), orderBy("createdAt", "desc")), (snap) => {
           cachedReports = snap.docs.map(d => ({ id: d.id, ...d.data() }));
           window.renderReportsTable();
         });
 
-        // Auto-join if URL parameter ?pin= is present
         const urlParams = new URLSearchParams(window.location.search);
         const autoPin = urlParams.get('pin');
         if (autoPin) {
@@ -678,24 +782,6 @@
           document.exitFullscreen().catch(()=>{});
         }
       };
-
-      // Desktop Keyboard Shortcuts
-      window.addEventListener('keydown', (e) => {
-        const keypadContainer = document.getElementById('answer-buttons-container');
-        if (keypadContainer && !keypadContainer.classList.contains('hidden') && !hasAnswered) {
-          const k = e.key.toUpperCase();
-          if (k === '1' || k === 'A') window.submitAnswer(0);
-          if (k === '2' || k === 'B') window.submitAnswer(1);
-          if (k === '3' || k === 'C') {
-            const btn2 = document.getElementById('btn-2');
-            if (btn2 && !btn2.classList.contains('hidden')) window.submitAnswer(2);
-          }
-          if (k === '4' || k === 'D') {
-            const btn3 = document.getElementById('btn-3');
-            if (btn3 && !btn3.classList.contains('hidden')) window.submitAnswer(3);
-          }
-        }
-      });
 
       // Authentication & Permissions
       window.attemptLogin = () => {
@@ -786,6 +872,7 @@
         document.getElementById('draft-count').innerText = "0 Questions Queued";
         document.getElementById('new-set-title').value = "";
         document.getElementById('create-modal').classList.remove('hidden');
+        window.updateCreatorLivePreview();
       };
 
       window.toggleQuestionType = () => {
@@ -817,6 +904,7 @@
           const el = document.getElementById(`opt-${i}`);
           if (el) el.value = "";
         }
+        window.updateCreatorLivePreview();
       };
 
       window.saveNewSet = async () => {
@@ -873,7 +961,6 @@
         document.getElementById('lobby-pin-display').textContent = currentGameId;
         playBGM('bgm-lobby');
 
-        // Dynamic QR code generation for instant scan-to-join
         const qrBox = document.getElementById('lobby-qrcode');
         qrBox.innerHTML = '';
         const roomJoinUrl = `${window.location.origin}${window.location.pathname}?pin=${currentGameId}`;
@@ -934,8 +1021,11 @@
 
         playBGM('bgm-timer');
         const q = activeQuizData[currentQIndex];
-        document.getElementById('host-question-text').innerText = q.question;
         
+        // Render STEM math / code for host projector
+        const qTextEl = document.getElementById('host-question-text');
+        window.renderSTEMToElement(qTextEl, q.question);
+
         const imgEl = document.getElementById('host-question-image');
         if (q.image) {
           imgEl.src = q.image;
@@ -950,7 +1040,6 @@
         document.getElementById('host-btn-next').classList.add('hidden');
         document.getElementById('host-btn-end').classList.add('hidden');
 
-        // Reset chart labels
         document.getElementById('label-0').innerText = "▲ RED";
         document.getElementById('label-1').innerText = "◆ BLUE";
         document.getElementById('label-2').innerText = "● AMBER";
@@ -1011,7 +1100,6 @@
         const totalAnswersIn = Math.max(1, liveAnswersCount);
         const accuracyPct = Math.round((correctCount / totalAnswersIn) * 100);
 
-        // Record Telemetry for this question
         sessionQuestionHistory.push({
           questionIndex: currentQIndex + 1,
           prompt: q.question,
@@ -1021,7 +1109,6 @@
           accuracyPct: accuracyPct
         });
 
-        // Telemetry Badge on Host Screen
         const badge = document.getElementById('host-accuracy-badge');
         badge.classList.remove('hidden');
         if (accuracyPct < 40) {
@@ -1035,7 +1122,6 @@
           badge.innerHTML = `✅ Class Accuracy: ${accuracyPct}% — High Class Mastery`;
         }
 
-        // Highlight correct option column label
         const targetLabel = document.getElementById(`label-${q.correct}`);
         if (targetLabel) targetLabel.innerText += " (CORRECT)";
 
@@ -1061,12 +1147,10 @@
         document.getElementById('host-podium-screen').classList.remove('hidden');
         playBGM('bgm-podium');
 
-        // Fetch Ranked Roster
         const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'games', currentGameId, 'players'), orderBy("score", "desc"));
         const querySnapshot = await getDocs(q);
         const rankedPlayers = querySnapshot.docs.map(d => d.data());
 
-        // Stage Podium Bars
         if (rankedPlayers[0]) {
           document.getElementById('podium-av-1').innerText = rankedPlayers[0].avatar;
           document.getElementById('podium-name-1').innerText = rankedPlayers[0].name;
@@ -1088,7 +1172,6 @@
 
         setTimeout(() => confetti({ particleCount: 220, spread: 80, origin: { y: 0.6 } }), 2100);
 
-        // Commit Real Match Telemetry to Firestore
         try {
           const totalAccuracySum = sessionQuestionHistory.reduce((acc, curr) => acc + curr.accuracyPct, 0);
           const meanAccuracy = sessionQuestionHistory.length > 0 ? Math.round(totalAccuracySum / sessionQuestionHistory.length) : 0;
@@ -1180,6 +1263,13 @@
           const isBinary = q.type === 2;
           document.getElementById('btn-2').classList.toggle('hidden', isBinary);
           document.getElementById('btn-3').classList.toggle('hidden', isBinary);
+
+          // Render KaTeX Math / STEM on answer choices if applicable
+          for (let i = 0; i < (isBinary ? 2 : 4); i++) {
+            const btnTextEl = document.getElementById(`btn-${i}-text`);
+            const optVal = q.options && q.options[i] ? q.options[i] : `Option ${i+1}`;
+            window.renderSTEMToElement(btnTextEl, optVal);
+          }
         }
       }
 
@@ -1237,7 +1327,7 @@
         if (playerScore > 0) confetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
       }
 
-      // --- LIVE REPORTS & TELEMETRY CSV PARSER ---
+      // Reports Table & Modal Audit Renderer
       window.renderReportsTable = () => {
         const container = document.getElementById('reports-ledger-container');
         if (!container) return;
@@ -1275,7 +1365,7 @@
               </div>
 
               <div class="flex items-center gap-2">
-                <button onclick="inspectReportBreakdown('${rep.id}')" class="px-4 py-2 bg-obsidian-800 hover:bg-obsidian-750 text-white font-mono text-xs rounded-xl transition">
+                <button onclick="inspectReportBreakdown('${rep.id}')" class="px-4 py-2 bg-obsidian-850 hover:bg-obsidian-750 text-white font-mono text-xs rounded-xl transition">
                   Audit Questions
                 </button>
                 <button onclick="downloadSingleReportCSV('${rep.id}')" class="px-4 py-2 bg-white hover:bg-slate-200 text-obsidian-950 font-bold font-mono text-xs rounded-xl arcade-key shadow-[0_2px_0_#94A3B8]">
@@ -1297,7 +1387,7 @@
         if (!rep.questions || rep.questions.length === 0) {
           container.innerHTML = `<p class="text-xs font-mono text-obsidian-400">No telemetry recorded for individual items.</p>`;
         } else {
-          container.innerHTML = rep.questions.map(q => {
+          container.innerHTML = rep.questions.map((q, idx) => {
             const isAlarm = q.accuracyPct < 40;
             return `
               <div class="p-4 rounded-xl border ${isAlarm ? 'bg-rose-950/20 border-rose-800/60' : 'bg-obsidian-850 border-obsidian-750'}">
@@ -1305,11 +1395,17 @@
                   <span class="text-xs font-mono font-bold ${isAlarm ? 'text-rose-400' : 'text-obsidian-400'}">Item ${q.questionIndex}</span>
                   <span class="text-xs font-mono font-bold ${isAlarm ? 'text-rose-300' : 'text-arcade-green'}">${q.accuracyPct}% Correct (${q.correctCount}/${q.totalResponses})</span>
                 </div>
-                <p class="text-sm font-medium text-white">${q.prompt}</p>
+                <div class="text-sm font-medium text-white" id="audit-prompt-${idx}"></div>
                 ${isAlarm ? `<p class="text-[11px] font-mono text-rose-400 mt-2">⚠️ Diagnostic Warning: Over 60% of students missed this question.</p>` : ''}
               </div>
             `;
           }).join('');
+
+          // Render STEM math and code across audit items
+          rep.questions.forEach((q, idx) => {
+            const el = document.getElementById(`audit-prompt-${idx}`);
+            window.renderSTEMToElement(el, q.prompt);
+          });
         }
 
         document.getElementById('breakdown-modal').classList.remove('hidden');
